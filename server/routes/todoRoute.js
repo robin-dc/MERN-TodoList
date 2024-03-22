@@ -2,16 +2,16 @@ const express = require('express');
 const todoRouter = express.Router();
 const {
     getAllTodo,
-    getSingleTodo,
+    checkTodo,
     addTodo,
     editTodo,
     deleteTodo
 } = require('../controller/todo.controller');
 
 todoRouter.get('/', getAllTodo);
-todoRouter.get('/:id', getSingleTodo);
+todoRouter.patch('/check', checkTodo);
 todoRouter.post('/', addTodo);
-todoRouter.patch('/:id', editTodo);
-todoRouter.delete('/:id', deleteTodo);
+todoRouter.patch('/edit', editTodo);
+todoRouter.delete('/delete/:id', deleteTodo);
 
 module.exports = todoRouter;

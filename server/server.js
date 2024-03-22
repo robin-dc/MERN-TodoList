@@ -14,7 +14,7 @@ app.use(express.urlencoded({limit: '30mb', extended: true}))
 app.use(morgan('dev'))
 app.use(cors())
 
-app.use('/todos', todoRouter)
+app.use('/api/todos', todoRouter)
 
 
 app.use(errorHandler)

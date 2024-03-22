@@ -1,34 +1,74 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react'
+import TodoItem from './components/TodoItem'
+import Api from './common/api'
+import toast, { Toaster } from 'react-hot-toast'
+
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [todos, setTodos] = useState(null)
+  const [modified, setModified] = useState(true)
+  const [text, setText] = useState('')
+
+  const getTodos = async() => {
+    const allTodos = await Api.getTodos()
+
+    setTodos(allTodos)
+  }
+
+  const checkTodo = async (id, isDone) => {
+    const checked = await Api.checkTodo(id, !isDone)
+
+    if(checked){
+      toast.success('Ticked')
+      setModified(!modified)
+  }
+  }
+  const deleteTodo = async (id) => {
+      const deleted = await Api.deleteTodo(id)
+
+      if(deleted){
+          toast.success('Todo deleted successfully')
+          setModified(!modified)
+      }
+  }
+  const createTodo = async (text) => {
+      const checked = await Api.createTodo(text)
+      if(checked){
+          toast.success('Todo added successfully')
+          setModified(!modified)
+          setText('')
+      }
+  }
+  const editTodo = async (id, text) => {
+      const checked = await Api.editTodo(id, text)
+      if(checked){
+          toast.success('Todo edited successfully')
+          setModified(!modified)
+          setText('')
+      }
+  }
+
+  useEffect(() => {
+    getTodos()
+    console.log(import.meta.env.VITE_BACKEND_URL)
+  }, [modified])
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div style={{maxWidth: "600px", margin: "0 auto"}}>
+      <nav style={{display: 'flex', alignItems: "center", justifyContent: "space-between"}}>
+        <Toaster />
+        <h1>TODOLIST</h1>
+        <div>
+          <input type="text" value={text} onChange={(e) => setText(e.target.value)}/>
+          <button onClick={() => createTodo(text)}>create</button>
+        </div>
+      </nav>
+      {
+        todos?.map((todo) => {
+          return <TodoItem key={todo._id} todoItem={todo} checkTodo={checkTodo} deleteTodo={deleteTodo} editTodo={editTodo}/>
+        })
+      }
+    </div>
   )
 }
 
